@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bloom Mobile — Staff & Smart Agent App</title>
+<style>
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#E8F0DA;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;}
+.rm-stage{background:#FAF5E8;border-radius:14px;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:760px;width:100%;}
+.rm-bar{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:520px;flex-wrap:wrap;gap:8px;}
+.rm-loc{font-size:11px;color:#3B6D11;background:#fff;border:0.5px solid #FAF5E8;padding:5px 10px;border-radius:999px;}
+.rm-loc b{color:#173404;font-weight:500;}
+.rm-ctrl{display:flex;gap:6px;flex-wrap:wrap;}
+.rm-ctrl button{font-size:11px;background:#fff;color:#137A3D;border:0.5px solid #FAF5E8;border-radius:8px;padding:5px 10px;cursor:pointer;font-weight:500;}
+.rm-ctrl button:hover{background:#FAF5E8;}
+.pf{background:#007848;border-radius:32px;padding:8px;width:340px;}
+.ps{background:#fff;border-radius:24px;overflow:hidden;height:620px;position:relative;}
+.scr{display:none;flex-direction:column;height:100%;padding:18px 16px;}
+.scr.act{display:flex;}
+.sb{display:flex;justify-content:space-between;font-size:10px;color:#173404;font-weight:500;flex-shrink:0;}
+.sb.dk{color:#FAF5E8;}
+.hd{display:flex;align-items:center;gap:10px;margin-top:10px;flex-shrink:0;}
+.bk{font-size:18px;color:#137A3D;cursor:pointer;border:none;background:none;padding:0;}
+.ttl{font-size:16px;font-weight:500;color:#173404;}
+.btn{border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:500;cursor:pointer;width:100%;}
+.btn-l{background:#C8302C;color:#FAF5E8;}
+.btn-o{background:#fff;color:#137A3D;border:0.5px solid #137A3D;}
+.btn-d{background:transparent;color:#FAF5E8;border:0.5px solid #C8302C;}
+.btn-w{background:#A32D2D;color:#fff;}
+.fld{border:0.5px solid #FAF5E8;border-radius:10px;padding:9px 12px;margin-top:7px;background:#fff;}
+.fld-d{border:1px solid #007848;border-radius:10px;padding:9px 12px;margin-top:7px;background:#173404;}
+.fld-lbl{font-size:10px;color:#3B6D11;}
+.fld-lbl-d{font-size:10px;color:#FAF5E8;}
+.fld-val{font-size:12px;color:#173404;margin-top:2px;font-weight:500;}
+.fld-val-d{font-size:12px;color:#fff;margin-top:2px;font-weight:500;}
+.fld input{border:none;outline:none;width:100%;font-size:12px;color:#173404;font-weight:500;background:transparent;margin-top:2px;}
+.tile{border:0.5px solid #FAF5E8;border-radius:10px;padding:8px;cursor:pointer;background:#fff;text-align:center;font-size:11px;color:#173404;font-weight:500;}
+.tile.sel{border:1.5px solid #137A3D;background:#FAF5E8;}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid #FAF5E8;cursor:pointer;}
+.row:last-child{border-bottom:none;}
+.scrl{flex:1;overflow-y:auto;margin:0 -16px;padding:0 16px;}
+.scrl::-webkit-scrollbar{width:0;}
+.cap{font-size:11px;color:#3B6D11;text-align:center;max-width:520px;line-height:1.5;}
+.summ-r{display:flex;justify-content:space-between;font-size:11px;padding:5px 0;border-bottom:0.5px solid #FAF5E8;}
+.summ-r span:first-child{color:#3B6D11;}
+.summ-r span:last-child{color:#173404;font-weight:500;}
+.chk{width:18px;height:18px;border-radius:50%;border:1.5px solid #FAF5E8;flex-shrink:0;}
+.chk.on{background:#137A3D;border-color:#137A3D;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.chip{font-size:10px;background:#fff;border:0.5px solid #FAF5E8;color:#173404;padding:6px 11px;border-radius:999px;cursor:pointer;display:inline-block;}
+.chip.on{background:#137A3D;color:#fff;border-color:#137A3D;}
+.gd2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.gd3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.gd4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+.kp button{background:#fff;border:0.5px solid #FAF5E8;border-radius:12px;padding:10px;font-size:15px;font-weight:500;color:#173404;cursor:pointer;}
+.staff-pill{display:inline-flex;align-items:center;gap:5px;background:#007848;color:#FAF5E8;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:500;letter-spacing:0.4px;}
+.agent-pill{display:inline-flex;align-items:center;gap:5px;background:#FFC72C;color:#1A1A1A;padding:3px 9px;border-radius:5px;font-size:9px;font-weight:600;letter-spacing:0.5px;}
+.qa{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.qa-i{width:42px;height:42px;background:#fff;border:0.5px solid #FAF5E8;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.qa-l{font-size:10px;color:#173404;font-weight:500;text-align:center;}
+.bnav{margin-top:auto;background:#fff;border-top:0.5px solid #FAF5E8;padding:9px 14px;display:flex;justify-content:space-around;flex-shrink:0;margin-left:-16px;margin-right:-16px;margin-bottom:-18px;}
+.bnav-i{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:9px;color:#3B6D11;padding:2px 6px;}
+.bnav-i.act{color:#137A3D;font-weight:500;}
+.bnav-d{width:18px;height:18px;}
+.suc-c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;}
+.suc-tk{width:80px;height:80px;border-radius:50%;background:#C8302C;display:flex;align-items:center;justify-content:center;}
+.stp{display:flex;justify-content:space-between;font-size:10px;color:#3B6D11;margin-top:8px;}
+.stp b{color:#173404;font-weight:500;}
+.pbar{height:4px;background:#FAF5E8;border-radius:2px;position:relative;margin-top:5px;}
+.pbar i{position:absolute;left:0;top:0;height:4px;background:#C8302C;border-radius:2px;}
+.case-card{background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:11px;cursor:pointer;}
+.case-pill{font-size:8.5px;padding:2px 7px;border-radius:5px;font-weight:500;letter-spacing:0.3px;}
+.lg{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600;}
+.lg-mtn{background:#FFC72C;color:#1A1A1A;font-size:10px;font-weight:700;}
+.lg-tel{background:#E60005;color:#fff;font-size:10px;font-weight:700;letter-spacing:-0.5px;}
+.lg-at{background:linear-gradient(135deg,#E60005 0%,#E60005 50%,#0066B3 50%,#0066B3 100%);color:#fff;font-size:9px;font-weight:700;}
+.note-row{display:flex;justify-content:space-between;align-items:center;background:#fff;border:0.5px solid #FAF5E8;border-radius:8px;padding:8px 10px;font-size:11px;color:#173404;}
+.note-row.sel{background:#FAF5E8;border-color:#137A3D;}
+.rng{appearance:none;-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:#FAF5E8;outline:none;cursor:pointer;}
+.rng::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#137A3D;border:3px solid #C8302C;cursor:pointer;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes puls{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.recdot{display:inline-block;width:6px;height:6px;background:#E24B4A;border-radius:50%;animation:puls 1.2s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<div class="rm-stage">
+
+<div style="text-align:center;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+<div style="display:flex;gap:10px;align-items:center;">
+<div style="width:32px;height:32px;background:#173404;display:flex;align-items:center;justify-content:center;border-radius:3px;"><span style="font-family:'Times New Roman',Georgia,serif;color:#FAF5E8;font-size:12px;font-weight:600;letter-spacing:0.8px;">BAM</span></div>
+<div style="display:inline-flex;align-items:center;font-family:Georgia,'Times New Roman',serif;font-size:18px;font-weight:500;color:#173404;line-height:1;">Bl<span style="display:inline-block;width:11px;height:11px;border:2px solid #C8302C;border-radius:50%;margin:0 -1px 0 1px;"></span><span style="display:inline-block;width:11px;height:11px;border:2px solid #C8302C;border-radius:50%;margin:0 1px 0 -4px;"></span>m Mobile</div>
+<span style="font-size:10px;color:#3B6D11;letter-spacing:1.5px;font-weight:500;">· STAFF</span>
+</div>
+<div style="font-size:10px;color:#3B6D11;">Agency banking app · field officers + Smart Agents · v1.0</div>
+</div>
+
+<div class="rm-bar">
+<div class="rm-loc">Screen · <b id="rm-cur">Splash</b></div>
+<div class="rm-ctrl">
+<button data-jump="splash">Start</button>
+<button data-jump="login">Officer login</button>
+<button data-jump="home">Dashboard</button>
+<button data-jump="field-open">Field open</button>
+<button data-jump="ops-hub">Operations</button>
+<button data-jump="loan-hub">Loans</button>
+<button data-jump="tasks-queue">Queue</button>
+<button data-jump="agent-list">Agents</button>
+<button data-jump="ag-splash">Smart Agent</button>
+<button id="rm-reset">Reset</button>
+</div>
+</div>
+
+<div class="pf"><div class="ps">
+
+<div class="scr act" id="splash" style="background:#007848;color:#fff;justify-content:space-between;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:60px;">
+<div style="width:78px;height:78px;background:#173404;display:flex;align-items:center;justify-content:center;border-radius:5px;box-shadow:0 8px 22px rgba(0,0,0,0.22);">
+<span style="font-family:'Times New Roman',Georgia,serif;color:#FAF5E8;font-size:24px;font-weight:600;letter-spacing:1.4px;">BAM</span>
+</div>
+<div style="text-align:center;">
+<div style="display:inline-flex;align-items:center;justify-content:center;font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:500;color:#FAF5E8;letter-spacing:0.3px;line-height:1;">
+<span>Bl</span>
+<span style="display:inline-block;width:18px;height:18px;border:2.8px solid #C8302C;border-radius:50%;margin:0 -2px 0 1px;"></span>
+<span style="display:inline-block;width:18px;height:18px;border:2.8px solid #C8302C;border-radius:50%;margin:0 1px 0 -6px;"></span>
+<span>m Mobile</span>
+</div>
+<div style="font-size:10px;color:#FAF5E8;margin-top:8px;letter-spacing:2.4px;font-weight:500;">AGENCY MICROFINANCE</div>
+</div>
+<div class="staff-pill" style="margin-top:6px;">STAFF PORTAL · FIELD OPERATIONS</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;">
+<button class="btn btn-l" data-go="login">Staff sign in</button>
+<!-- <button class="btn btn-d" data-go="ag-splash">Smart Agent sign in</button> -->
+<div style="text-align:center;font-size:9px;color:#FAF5E8;margin-top:4px;">All actions logged · BoG compliant</div>
+</div>
+</div>
+
+<div class="scr" id="login" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div style="text-align:center;margin-top:18px;">
+<div style="width:48px;height:48px;background:#173404;display:flex;align-items:center;justify-content:center;border-radius:4px;margin:0 auto;box-shadow:0 4px 12px rgba(0,0,0,0.2);"><span style="font-family:'Times New Roman',Georgia,serif;color:#FAF5E8;font-size:16px;font-weight:600;letter-spacing:1px;">BAM</span></div>
+<div class="staff-pill" style="margin-top:10px;">FIELD OFFICER LOGIN</div>
+</div>
+<div class="scrl" style="margin-top:14px;">
+<div class="fld-d"><div class="fld-lbl-d">Officer ID</div><div class="fld-val-d">RM‑OFF‑4421</div></div>
+<div class="fld-d"><div class="fld-lbl-d">Password</div><div style="display:flex;gap:6px;margin-top:6px;"><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#C8302C;border-radius:50%;"></span></div></div>
+<div class="fld-d"><div class="fld-lbl-d">Branch / Zone</div><div class="fld-val-d">Greater Accra · Field Zone 4 ▾</div></div>
+<div style="margin-top:12px;background:#173404;border-radius:10px;padding:10px;font-size:9.5px;color:#FAF5E8;line-height:1.5;">Sign‑in requires SMS MFA + GPS verification. All session activity is logged with timestamps and location.</div>
+<div style="margin-top:10px;display:flex;align-items:flex-start;gap:8px;font-size:9.5px;color:#FAF5E8;line-height:1.5;"><div class="chk on" style="margin-top:1px;flex-shrink:0;">✓</div><span>I confirm I am acting in my official capacity</span></div>
+</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="mfa">Continue to MFA</button>
+</div>
+
+<div class="scr" id="mfa">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">SMS verification</div></div>
+<div style="background:#FAF5E8;border-radius:10px;padding:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:9px;color:#3B6D11;letter-spacing:0.5px;">CODE SENT TO</div><div style="font-size:13px;color:#173404;font-weight:500;">+233 30 274 ••• 5510</div></div><div style="background:#137A3D;color:#FAF5E8;padding:2px 8px;border-radius:5px;font-size:8.5px;font-weight:500;">DELIVERED</div></div>
+<div style="margin-top:18px;display:flex;justify-content:center;gap:7px;">
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">8</div>
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">3</div>
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">5</div>
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">2</div>
+<div style="width:38px;height:48px;border:1.5px solid #FAF5E8;border-radius:8px;"></div>
+<div style="width:38px;height:48px;border:1.5px solid #FAF5E8;border-radius:8px;"></div>
+</div>
+<div class="kp"><button>1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>6</button><button>7</button><button>8</button><button>9</button><button style="visibility:hidden;"></button><button>0</button><button>⌫</button></div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="geo">Verify & continue</button>
+</div>
+
+<div class="scr" id="geo">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><div class="ttl">Confirm location</div></div>
+<div style="font-size:10px;color:#3B6D11;margin-top:6px;">GPS lock for the session · required for cash transactions</div>
+<div style="margin-top:10px;height:170px;border-radius:14px;background:linear-gradient(135deg,#FAF5E8 0%,#FAF5E8 100%);position:relative;overflow:hidden;border:0.5px solid #FAF5E8;">
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130px;height:130px;border:1.5px dashed #137A3D;border-radius:50%;background:rgba(200,48,44,0.15);"></div>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-100%) rotate(-45deg);width:30px;height:30px;background:#137A3D;border-radius:50% 50% 50% 0;display:flex;align-items:center;justify-content:center;border:3px solid #fff;animation:puls 1.6s ease-in-out infinite;"><div style="transform:rotate(45deg);width:10px;height:10px;background:#C8302C;border-radius:50%;"></div></div>
+<div style="position:absolute;bottom:8px;left:8px;background:#173404;color:#FAF5E8;font-size:9px;padding:3px 8px;border-radius:5px;">📍 5.6362°N · ‑0.1696°W</div>
+<div style="position:absolute;top:8px;right:8px;background:#137A3D;color:#FAF5E8;font-size:9px;padding:3px 8px;border-radius:5px;">✓ INSIDE ZONE 4</div>
+</div>
+<div style="margin-top:10px;background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:10px;font-size:10.5px;">
+<div class="summ-r"><span>Address</span><span>Madina Zongo Junction</span></div>
+<div class="summ-r"><span>Geofence</span><span>500m · within bounds</span></div>
+<div class="summ-r" style="border:none;"><span>GPS accuracy</span><span style="color:#137A3D;">±4m strong</span></div>
+</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="home">Confirm & start session</button>
+</div>
+
+<div class="scr" id="home" style="padding:0;background:#FAF5E8;">
+<div style="background:#007848;color:#fff;padding:14px 16px;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+<div style="display:flex;gap:9px;align-items:center;"><div style="width:32px;height:32px;border-radius:50%;background:#C8302C;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;">AS</div><div><div style="font-size:13px;font-weight:500;">Akua Sefa</div><div style="font-size:9px;color:#FAF5E8;">Officer 4421 · Zone 4</div></div></div>
+<span class="staff-pill" style="background:#173404;">ON SHIFT · 02:14</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px;">
+<div style="background:#173404;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:16px;color:#FAF5E8;font-weight:500;">12</div><div style="font-size:8px;color:#FAF5E8;">Customers today</div></div>
+<div style="background:#173404;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:16px;color:#fff;font-weight:500;">GHS 24,500</div><div style="font-size:8px;color:#FAF5E8;">Cash on hand</div></div>
+<div style="background:#173404;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:16px;color:#fff;font-weight:500;">3</div><div style="font-size:8px;color:#FAF5E8;">Pending tasks</div></div>
+</div>
+</div>
+<div style="padding:12px 16px;">
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-bottom:8px;letter-spacing:0.4px;">QUICK ACTIONS</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;">
+<div class="qa" data-go="cust-search"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg></div><div class="qa-l">Find customer</div></div>
+<div class="qa" data-go="field-open"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><circle cx="12" cy="9" r="3"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/><path d="M16 4h6M19 1v6"/></svg></div><div class="qa-l">New customer</div></div>
+<div class="qa" data-go="ops-hub"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><path d="M12 2v20M5 9l7-7 7 7"/></svg></div><div class="qa-l">Cash deposit</div></div>
+<div class="qa" data-go="ops-hub"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><path d="M12 22V2M5 15l7 7 7-7"/></svg></div><div class="qa-l">Withdrawal</div></div>
+<div class="qa" data-go="ops-hub"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/></svg></div><div class="qa-l">MoMo deposit</div></div>
+<div class="qa" data-go="loan-hub"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="qa-l">Loans</div></div>
+<div class="qa" data-go="outward-bank"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h12"/></svg></div><div class="qa-l">Outward</div></div>
+<div class="qa" data-go="callover"><div class="qa-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137A3D" stroke-width="2"><path d="M14 2H6v20h12V6z"/><path d="M14 2v4h4M9 13h6"/></svg></div><div class="qa-l">Call over</div></div>
+</div>
+</div>
+<div style="padding:0 16px;"><div style="background:#FAEEDA;border:0.5px solid #FAC775;border-radius:12px;padding:11px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" data-go="tasks-queue"><div style="display:flex;gap:9px;align-items:center;"><div style="width:30px;height:30px;border-radius:8px;background:#FAC775;color:#412402;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13px;">3</div><div><div style="font-size:11px;color:#412402;font-weight:500;">Pending verification queue</div><div style="font-size:9px;color:#854F0B;">2 video reviews · 1 PEP case</div></div></div><span style="font-size:13px;color:#854F0B;">→</span></div></div>
+<div class="scrl" style="padding:12px 16px 0;">
+<div style="font-size:11px;color:#3B6D11;font-weight:500;letter-spacing:0.4px;margin-bottom:6px;">RECENT ACTIVITY</div>
+<div class="row" style="cursor:default;"><div style="display:flex;gap:9px;align-items:center;"><div style="width:28px;height:28px;border-radius:7px;background:#C8302C;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="2.4"><path d="M12 2v20M5 9l7-7 7 7"/></svg></div><div><div style="font-size:11px;color:#173404;font-weight:500;">Cash deposit · Ama K.</div><div style="font-size:9px;color:#3B6D11;">12 min ago</div></div></div><span style="font-size:11px;color:#137A3D;font-weight:500;">+800.00</span></div>
+<div class="row" style="cursor:default;"><div style="display:flex;gap:9px;align-items:center;"><div style="width:28px;height:28px;border-radius:7px;background:#137A3D;"></div><div><div style="font-size:11px;color:#173404;font-weight:500;">Account opened · Kofi M.</div><div style="font-size:9px;color:#3B6D11;">28 min ago · awaiting auth</div></div></div></div>
+</div>
+<div class="bnav">
+<div class="bnav-i act"><div class="bnav-d"></div><span>Home</span></div>
+<div class="bnav-i" data-go="ops-hub"><div class="bnav-d"></div><span>Operations</span></div>
+<div class="bnav-i" data-go="cust-search"><div class="bnav-d"></div><span>Customers</span></div>
+<div class="bnav-i" data-go="tasks-queue"><div class="bnav-d"></div><span>Tasks</span></div>
+<div class="bnav-i" data-go="agent-list"><div class="bnav-d"></div><span>Agents</span></div>
+</div>
+</div>
+
+<div class="scr" id="cust-search" style="padding:0;background:#FAF5E8;">
+<div style="padding:18px 16px 0;"><div class="sb"><span>9:41</span><span>•••• 5G</span></div><div class="hd" style="justify-content:space-between;"><div style="display:flex;gap:10px;align-items:center;"><button class="bk" data-back>‹</button><div class="ttl">Customers</div></div><span style="font-size:11px;color:#137A3D;font-weight:500;cursor:pointer;" data-go="field-open">+ New</span></div></div>
+<div style="padding:10px 16px 0;">
+<div class="fld" style="display:flex;gap:8px;align-items:center;background:#FAF5E8;border:none;"><span style="color:#137A3D;">⌕</span><input type="text" placeholder="Search by name, phone, account, Ghana Card..."/></div>
+<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><span class="chip on">All</span><span class="chip">My customers</span><span class="chip">New today</span></div>
+</div>
+<div class="scrl" style="padding:10px 16px 0;">
+<div class="row" data-go="loan-hub"><div style="display:flex;gap:10px;align-items:center;"><div style="width:36px;height:36px;border-radius:50%;background:#137A3D;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;">AK</div><div><div style="font-size:11px;color:#173404;font-weight:500;">Ama Konadu</div><div style="font-size:9px;color:#3B6D11;">0245 871 4218 · Bloom Plus</div></div></div><span style="background:#FAF5E8;color:#137A3D;padding:2px 7px;border-radius:5px;font-size:8.5px;font-weight:500;">ACTIVE</span></div>
+<div class="row" data-go="loan-hub"><div style="display:flex;gap:10px;align-items:center;"><div style="width:36px;height:36px;border-radius:50%;background:#007848;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;">YA</div><div><div style="font-size:11px;color:#173404;font-weight:500;">Yaa Asare</div><div style="font-size:9px;color:#3B6D11;">0245 833 7012 · loan customer</div></div></div><span style="background:#FAF5E8;color:#137A3D;padding:2px 7px;border-radius:5px;font-size:8.5px;font-weight:500;">ACTIVE</span></div>
+</div>
+</div>
+
+<div class="scr" id="field-open">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd" style="justify-content:space-between;"><div style="display:flex;gap:10px;align-items:center;"><button class="bk" data-back>‹</button><div class="ttl">New customer · field</div></div><span class="staff-pill">OFFICER 4421</span></div>
+<div class="scrl" style="margin-top:10px;">
+<div style="background:#137A3D;color:#fff;border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;"><div style="width:36px;height:36px;border-radius:50%;background:#C8302C;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:14px;">📍</div><div><div style="font-size:9px;color:#FAF5E8;letter-spacing:0.4px;">YOU'RE OPENING IN</div><div style="font-size:13px;font-weight:500;">Madina Zongo Junction · Zone 4</div></div></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">CUSTOMER NEEDS</div>
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;margin-top:5px;">
+<div class="row" style="padding:9px 12px;cursor:default;"><div style="display:flex;gap:9px;align-items:center;"><div class="chk on">✓</div><span style="font-size:11px;color:#173404;">Their physical Ghana Card</span></div></div>
+<div class="row" style="padding:9px 12px;cursor:default;"><div style="display:flex;gap:9px;align-items:center;"><div class="chk on">✓</div><span style="font-size:11px;color:#173404;">A phone number they own</span></div></div>
+<div class="row" style="padding:9px 12px;cursor:default;"><div style="display:flex;gap:9px;align-items:center;"><div class="chk on">✓</div><span style="font-size:11px;color:#173404;">Next of kin contact</span></div></div>
+</div>
+<div style="margin-top:12px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Offline mode is on.</b> Capture now · syncs when back in coverage.</div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="field-card">Start with Ghana Card</button>
+</div>
+
+<div class="scr" id="field-card">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Scan Ghana Card</div></div>
+<div class="stp"><span>Step <b>1</b> of 5 · Identity</span><span>NIA real‑time</span></div>
+<div class="pbar"><i style="width:20%;"></i></div>
+<div style="margin-top:14px;height:160px;border:2px dashed #137A3D;border-radius:14px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;position:relative;">
+<div style="width:78%;height:78%;border:2px solid #C8302C;border-radius:10px;background:#fff;padding:8px;display:flex;flex-direction:column;justify-content:space-between;"><div style="display:flex;justify-content:space-between;font-size:8px;color:#173404;font-weight:500;"><span>REPUBLIC OF GHANA</span><span>NIA</span></div></div>
+<div style="position:absolute;bottom:8px;background:#173404;color:#FAF5E8;font-size:9px;padding:3px 10px;border-radius:8px;font-weight:500;">Card detected · hold steady</div>
+</div>
+<div class="fld"><div class="fld-lbl">Card number</div><div class="fld-val">GHA‑791234567‑8</div></div>
+<div style="margin-top:10px;background:#FAF5E8;border-radius:10px;padding:10px;display:flex;gap:8px;align-items:center;"><div class="chk on">✓</div><div style="font-size:10.5px;color:#173404;line-height:1.5;"><b style="font-weight:500;">NIA matched.</b> Biometric verified · name auto‑filled</div></div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="field-customer">Continue · capture photo</button>
+</div>
+
+<div class="scr" id="field-customer">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Customer details</div></div>
+<div class="stp"><span>Step <b>2</b> of 5 · Personal</span><span>Auto‑filled</span></div>
+<div class="pbar"><i style="width:40%;"></i></div>
+<div class="scrl" style="margin-top:10px;">
+<div style="display:flex;gap:10px;align-items:center;background:#FAF5E8;border-radius:12px;padding:10px;"><div style="width:54px;height:54px;border-radius:50%;background:#137A3D;display:flex;align-items:center;justify-content:center;border:2px solid #C8302C;flex-shrink:0;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FAF5E8" stroke-width="1.6"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg></div><div style="flex:1;"><div style="font-size:9px;color:#3B6D11;letter-spacing:0.4px;">CUSTOMER PHOTO · OFFICER CAPTURED</div><div style="font-size:11px;color:#173404;font-weight:500;margin-top:2px;">Liveness ✓ · matches card 96%</div></div></div>
+<div class="fld"><div class="fld-lbl">Full name (from card)</div><div class="fld-val">Esi Bonney Asante</div></div>
+<div class="gd2" style="margin-top:7px;"><div class="fld" style="margin-top:0;"><div class="fld-lbl">DOB</div><div class="fld-val">22 Mar 1988</div></div><div class="fld" style="margin-top:0;"><div class="fld-lbl">Gender</div><div class="fld-val">Female</div></div></div>
+<div class="fld" style="display:flex;gap:8px;align-items:center;"><span style="font-size:12px;color:#173404;font-weight:500;">🇬🇭 +233</span><input type="tel" value="26 552 8810"/></div>
+<div class="fld"><div class="fld-lbl">Mother's maiden name</div><input type="text" value="Adjoa"/></div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="field-address">Continue</button>
+</div>
+
+<div class="scr" id="field-address">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Address & income</div></div>
+<div class="stp"><span>Step <b>3</b> of 5</span><span></span></div>
+<div class="pbar"><i style="width:60%;"></i></div>
+<div class="scrl" style="margin-top:10px;">
+<div style="height:80px;border-radius:10px;background:linear-gradient(135deg,#FAF5E8 0%,#FAF5E8 100%);position:relative;border:0.5px solid #FAF5E8;"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-100%) rotate(-45deg);width:22px;height:22px;background:#137A3D;border-radius:50% 50% 50% 0;border:2px solid #fff;"></div><div style="position:absolute;bottom:6px;left:6px;background:#173404;color:#FAF5E8;font-size:9px;padding:2px 7px;border-radius:5px;">📍 Customer location · captured</div></div>
+<div class="fld"><div class="fld-lbl">Ghana Post GPS</div><input type="text" value="GM‑042‑8821"/></div>
+<div class="fld"><div class="fld-lbl">Street & landmark</div><input type="text" value="House B17 · near Zongo Junction Mosque"/></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">Employment</div>
+<div class="gd3" style="margin-top:5px;"><div class="tile sel" style="padding:8px 4px;">Self‑employed</div><div class="tile" style="padding:8px 4px;">Employed</div><div class="tile" style="padding:8px 4px;">Farmer</div><div class="tile" style="padding:8px 4px;">Trader</div><div class="tile" style="padding:8px 4px;">Student</div><div class="tile" style="padding:8px 4px;">Other</div></div>
+<div class="fld"><div class="fld-lbl">Estimated monthly income · GHS</div><div class="fld-val">1,500 — 3,000 ▾</div></div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="field-purpose">Continue</button>
+</div>
+
+<div class="scr" id="field-purpose">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Purpose & next of kin</div></div>
+<div class="stp"><span>Step <b>4</b> of 5</span><span></span></div>
+<div class="pbar"><i style="width:80%;"></i></div>
+<div class="scrl" style="margin-top:10px;">
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-bottom:5px;">Purpose</div>
+<div class="gd2"><div class="tile sel" style="padding:9px;">Daily savings</div><div class="tile" style="padding:9px;">Business cashflow</div><div class="tile" style="padding:9px;">Receive remittance</div><div class="tile" style="padding:9px;">Loan eligibility</div></div>
+<div style="margin-top:12px;background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:11px;"><div style="font-size:11px;color:#173404;font-weight:500;">PEP screening</div><div style="display:flex;gap:6px;margin-top:8px;"><span class="chip on">No</span><span class="chip">Yes</span></div></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">Next of kin</div>
+<div class="fld"><div class="fld-lbl">Full name</div><input type="text" value="Yaa Bonney"/></div>
+<div class="fld"><div class="fld-lbl">Phone</div><input type="tel" value="+233 24 992 1140"/></div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="field-deposit">Continue</button>
+</div>
+
+<div class="scr" id="field-deposit">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Initial deposit</div></div>
+<div style="font-size:10px;color:#3B6D11;margin-top:6px;">Optional · cash held until authorisation</div>
+<div style="background:#137A3D;color:#fff;border-radius:12px;padding:13px;margin-top:12px;text-align:center;"><div style="font-size:9px;color:#FAF5E8;letter-spacing:0.4px;">CASH RECEIVED</div><div style="font-size:30px;font-weight:500;margin-top:4px;">GHS 200</div><div style="font-size:10px;color:#FAF5E8;margin-top:2px;">2× GHS 100 verified</div></div>
+<div class="gd3" style="margin-top:14px;"><div class="tile" style="padding:9px 4px;">GHS 50</div><div class="tile" style="padding:9px 4px;">GHS 100</div><div class="tile sel" style="padding:9px 4px;">GHS 200</div><div class="tile" style="padding:9px 4px;">GHS 500</div><div class="tile" style="padding:9px 4px;">Custom</div><div class="tile" style="padding:9px 4px;">Skip</div></div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Anti‑fraud:</b> deposit held until account authorised · returns to drawer if rejected.</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="field-signature">Continue</button>
+</div>
+
+<div class="scr" id="field-signature">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Sign & witness</div></div>
+<div class="stp"><span>Step <b>5</b> of 5</span><span>Both parties</span></div>
+<div class="pbar"><i style="width:100%;"></i></div>
+<div class="scrl" style="margin-top:10px;">
+<div style="font-size:11px;color:#3B6D11;font-weight:500;">Customer signature · Esi Bonney</div>
+<div style="height:80px;background:#fff;border:1.5px dashed #C8302C;border-radius:10px;cursor:pointer;"><svg width="100%" height="100%" viewBox="0 0 200 80" preserveAspectRatio="none"><path d="M10 55 Q 25 20, 45 50 T 80 45 Q 100 25, 120 55 T 165 40" stroke="#137A3D" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">Officer witness · Akua Sefa</div>
+<div style="height:60px;background:#FAF5E8;border:0.5px solid #137A3D;border-radius:10px;"><svg width="100%" height="100%" viewBox="0 0 200 60" preserveAspectRatio="none"><path d="M15 35 Q 30 12, 50 30 T 90 28 Q 110 15, 135 38 T 175 22" stroke="#007848" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+<div style="margin-top:12px;background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:11px;font-size:10.5px;color:#173404;line-height:1.6;"><b style="font-weight:500;">Field declaration:</b> "I, Akua Sefa (Officer 4421), confirm Esi Bonney signed in my presence at Madina Zongo Junction on 29 Apr 2026 · 09:42."</div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="field-submitted">Submit application</button>
+</div>
+
+<div class="scr" id="field-submitted" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div style="text-align:center;margin-top:14px;">
+<div style="display:inline-flex;width:74px;height:74px;border-radius:50%;background:#173404;border:3px solid #C8302C;align-items:center;justify-content:center;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FAF5E8" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+<div style="font-size:18px;font-weight:500;margin-top:10px;">Application submitted</div>
+<div style="font-size:11px;color:#FAF5E8;letter-spacing:0.5px;font-weight:500;">AWAITING AUTHORISATION</div>
+</div>
+<div style="margin-top:14px;background:#173404;border-radius:12px;padding:13px;text-align:center;">
+<div style="font-size:9px;color:#FAF5E8;letter-spacing:0.5px;">PROVISIONAL ACCOUNT</div>
+<div style="font-size:18px;font-weight:500;color:#fff;margin-top:3px;letter-spacing:1.5px;">0245 933 2027</div>
+<div style="font-size:9.5px;color:#FAF5E8;margin-top:5px;">Bloom Plus · Esi Bonney Asante</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:auto;"><button class="btn btn-o" style="font-size:11px;flex:1;color:#137A3D;">Print</button><button class="btn btn-l" style="font-size:11px;flex:1;" data-go="home">Next customer</button></div>
+</div>
+
+<div class="scr" id="ops-hub" style="padding:0;background:#FAF5E8;">
+<div style="background:#007848;color:#fff;padding:14px 16px;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" style="color:#FAF5E8;" data-back>‹</button><div class="ttl" style="color:#fff;">Operations</div></div>
+<div style="margin-top:14px;"><div style="font-size:9px;color:#FAF5E8;letter-spacing:0.5px;">CASH DRAWER · OFFICER 4421</div><div style="font-size:24px;font-weight:500;margin-top:4px;">GHS 24,500.00</div><div style="height:4px;background:#173404;border-radius:2px;margin-top:6px;"><div style="width:49%;height:4px;background:#C8302C;border-radius:2px;"></div></div></div>
+</div>
+<div class="scrl" style="padding:14px 16px 0;">
+<div class="tile" data-go="cd-find" style="display:flex;gap:11px;align-items:center;padding:13px;text-align:left;margin-bottom:8px;">
+<div style="width:42px;height:42px;border-radius:11px;background:#137A3D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FAF5E8" stroke-width="2.4"><path d="M12 2v20M5 9l7-7 7 7"/></svg></div>
+<div style="flex:1;"><div style="font-size:13px;color:#173404;font-weight:500;">Cash collection</div><div style="font-size:9.5px;color:#3B6D11;">Take cash · deposit · float increases</div></div><span style="font-size:13px;color:#137A3D;">›</span>
+</div>
+<div class="tile" data-go="cw-find" style="display:flex;gap:11px;align-items:center;padding:13px;text-align:left;margin-bottom:8px;">
+<div style="width:42px;height:42px;border-radius:11px;background:#C8302C;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="2.4"><path d="M12 22V2M5 15l7 7 7-7"/></svg></div>
+<div style="flex:1;"><div style="font-size:13px;color:#173404;font-weight:500;">Cash withdrawal</div><div style="font-size:9.5px;color:#3B6D11;">OTP required · float decreases</div></div><span style="font-size:13px;color:#137A3D;">›</span>
+</div>
+<div class="tile" data-go="md-collect" style="display:flex;gap:11px;align-items:center;padding:13px;text-align:left;margin-bottom:8px;">
+<div style="width:42px;height:42px;border-radius:11px;background:#FFC72C;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.4"><rect x="7" y="3" width="10" height="18" rx="2"/></svg></div>
+<div style="flex:1;"><div style="font-size:13px;color:#173404;font-weight:500;">MoMo deposit</div><div style="font-size:9.5px;color:#3B6D11;">Customer pushes from wallet</div></div><span style="font-size:13px;color:#137A3D;">›</span>
+</div>
+<div class="tile" data-go="outward-bank" style="display:flex;gap:11px;align-items:center;padding:13px;text-align:left;">
+<div style="width:42px;height:42px;border-radius:11px;background:#007848;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FAF5E8" stroke-width="2.4"><path d="M3 12h18M3 6h18M3 18h12"/></svg></div>
+<div style="flex:1;"><div style="font-size:13px;color:#173404;font-weight:500;">Outward transfer</div><div style="font-size:9.5px;color:#3B6D11;">Lodge to corresponding bank</div></div><span style="font-size:13px;color:#137A3D;">›</span>
+</div>
+</div>
+</div>
+
+<div class="scr" id="cd-find">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Cash deposit · find</div></div>
+<div class="fld" style="display:flex;gap:8px;align-items:center;background:#FAF5E8;border:none;margin-top:10px;"><span style="color:#137A3D;">⌕</span><input type="text" value="0245 871 4218"/></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="tile" data-go="cd-amount" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;">
+<div style="width:42px;height:42px;border-radius:50%;background:#137A3D;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;">AK</div>
+<div style="flex:1;"><div style="font-size:12px;color:#173404;font-weight:500;">Ama Konadu</div><div style="font-size:9px;color:#3B6D11;">Bloom Plus · 0245 871 4218</div></div>
+</div>
+</div>
+</div>
+
+<div class="scr" id="cd-amount">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Deposit amount</div></div>
+<div style="background:#137A3D;color:#fff;border-radius:14px;padding:14px;margin-top:10px;text-align:center;"><div style="font-size:9px;color:#FAF5E8;letter-spacing:0.5px;">DEPOSIT</div><div style="font-size:30px;font-weight:500;margin-top:3px;">GHS 800</div></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">NOTE COUNT</div>
+<div class="scrl" style="margin-top:6px;">
+<div class="note-row sel" style="margin-bottom:5px;"><span><b style="font-weight:500;">GHS 200</b> notes</span><span>2 = 400</span></div>
+<div class="note-row sel" style="margin-bottom:5px;"><span><b style="font-weight:500;">GHS 100</b> notes</span><span>3 = 300</span></div>
+<div class="note-row sel" style="margin-bottom:5px;"><span><b style="font-weight:500;">GHS 50</b> notes</span><span>2 = 100</span></div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="cd-success">Confirm count & deposit</button>
+</div>
+
+<div class="scr" id="cd-success" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:20px;font-weight:500;">Deposit posted</div>
+<div style="font-size:24px;font-weight:500;color:#FAF5E8;">GHS 800.00</div>
+<div style="font-size:11px;color:#FAF5E8;">to Ama Konadu</div>
+</div>
+<button class="btn btn-l" data-go="ops-hub">Done</button>
+</div>
+
+<div class="scr" id="cw-find">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Withdrawal · find</div></div>
+<div class="fld" style="display:flex;gap:8px;align-items:center;background:#FAF5E8;border:none;margin-top:10px;"><span style="color:#137A3D;">⌕</span><input type="text" value="Yaa Asare"/></div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Withdrawals require Ghana Card scan + customer OTP.</b></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="tile" data-go="cw-amount" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;">
+<div style="width:42px;height:42px;border-radius:50%;background:#007848;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;">YA</div>
+<div style="flex:1;"><div style="font-size:12px;color:#173404;font-weight:500;">Yaa Asare</div><div style="font-size:9px;color:#3B6D11;">Available · GHS 8,420</div></div>
+</div>
+</div>
+</div>
+
+<div class="scr" id="cw-amount">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Withdrawal amount</div></div>
+<div class="fld" style="background:#FAF5E8;border:none;margin-top:10px;"><div class="fld-lbl">Amount · GHS</div><input type="text" value="500.00" style="font-size:20px;"/></div>
+<div class="gd3" style="margin-top:8px;"><div class="tile" style="padding:8px;">100</div><div class="tile" style="padding:8px;">200</div><div class="tile sel" style="padding:8px;">500</div><div class="tile" style="padding:8px;">1,000</div></div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Next:</b> 6‑digit OTP to customer's phone.</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="cw-otp">Send OTP</button>
+</div>
+
+<div class="scr" id="cw-otp">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Customer OTP</div></div>
+<div style="margin-top:18px;display:flex;justify-content:center;gap:7px;">
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">4</div>
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">7</div>
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">1</div>
+<div style="width:38px;height:48px;border:1.5px solid #137A3D;border-radius:8px;background:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#173404;">2</div>
+<div style="width:38px;height:48px;border:1.5px solid #FAF5E8;border-radius:8px;"></div>
+<div style="width:38px;height:48px;border:1.5px solid #FAF5E8;border-radius:8px;"></div>
+</div>
+<div class="kp"><button>1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>6</button><button>7</button><button>8</button><button>9</button><button style="visibility:hidden;"></button><button>0</button><button>⌫</button></div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="cw-success">Verify & dispense</button>
+</div>
+
+<div class="scr" id="cw-success" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:18px;font-weight:500;">Withdrawal authorised</div>
+<div style="font-size:24px;font-weight:500;color:#FAF5E8;">GHS 500.00</div>
+<div style="background:#173404;border-radius:12px;padding:11px;font-size:10px;color:#FAF5E8;text-align:left;width:100%;box-sizing:border-box;">Hand over: 5 × GHS 100 OR 2 × GHS 200 + 1 × GHS 100</div>
+</div>
+<button class="btn btn-l" data-go="ops-hub">Done</button>
+</div>
+
+<div class="scr" id="md-collect">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">MoMo deposit</div></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="gd3"><div class="tile sel" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;"><div class="lg lg-mtn">MTN</div><div style="font-size:10px;font-weight:500;">MTN</div></div><div class="tile" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;"><div class="lg lg-tel">telecel</div><div style="font-size:10px;font-weight:500;">Telecel</div></div><div class="tile" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;"><div class="lg lg-at">AT</div><div style="font-size:10px;font-weight:500;">AT</div></div></div>
+<div class="fld" style="display:flex;gap:8px;align-items:center;"><span style="font-size:12px;color:#173404;font-weight:500;">🇬🇭 +233</span><input type="tel" value="24 871 4218"/></div>
+<div class="fld" style="background:#FAF5E8;border:none;"><div class="fld-lbl">Amount · GHS</div><input type="text" value="450.00" style="font-size:20px;"/></div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Anti‑fraud:</b> push to customer's phone · officer never enters her PIN.</div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="md-pending">Send push</button>
+</div>
+
+<div class="scr" id="md-pending" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div style="position:relative;width:90px;height:90px;"><div style="position:absolute;inset:0;border:3px solid #173404;border-top-color:#FAF5E8;border-radius:50%;animation:spin 1.4s linear infinite;"></div></div>
+<div style="font-size:14px;font-weight:500;color:#fff;">Push sent</div>
+<div style="font-size:11px;color:#FAF5E8;animation:puls 1.4s ease-in-out infinite;">Awaiting customer PIN...</div>
+</div>
+<button class="btn btn-l" data-go="md-success">Customer approved</button>
+</div>
+
+<div class="scr" id="md-success" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:20px;font-weight:500;">MoMo deposit posted</div>
+<div style="font-size:24px;font-weight:500;color:#FAF5E8;">GHS 450.00</div>
+<div style="font-size:10px;color:#FAF5E8;">Officer commission · GHS 4.50</div>
+</div>
+<button class="btn btn-l" data-go="ops-hub">Done</button>
+</div>
+
+<div class="scr" id="loan-hub" style="padding:0;background:#FAF5E8;">
+<div style="background:#007848;color:#fff;padding:14px 16px;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" style="color:#FAF5E8;" data-back>‹</button><div class="ttl" style="color:#fff;">Loans · Yaa Asare</div></div>
+</div>
+<div style="padding:12px 16px;">
+<div style="background:#173404;color:#fff;border-radius:14px;padding:12px;">
+<div style="font-size:9px;color:#FAF5E8;">ACTIVE LOAN · RM/2026/8821</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px;"><div><div style="font-size:9px;color:#FAF5E8;">Outstanding</div><div style="font-size:20px;font-weight:500;">GHS 7,800</div></div><div style="text-align:right;font-size:11px;font-weight:500;">May 25 · GHS 763</div></div>
+</div>
+</div>
+<div class="scrl" style="padding:0 16px;">
+<div class="tile" data-go="loan-new" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;margin-bottom:6px;">
+<div style="width:34px;height:34px;border-radius:9px;background:#137A3D;flex-shrink:0;"></div>
+<div style="flex:1;"><div style="font-size:12px;color:#173404;font-weight:500;">Initiate new loan</div><div style="font-size:9.5px;color:#3B6D11;">Pre‑approved up to GHS 12,000</div></div>
+</div>
+<div class="tile" data-go="loan-topup" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;margin-bottom:6px;">
+<div style="width:34px;height:34px;border-radius:9px;background:#C8302C;flex-shrink:0;"></div>
+<div style="flex:1;"><div style="font-size:12px;color:#173404;font-weight:500;">Top‑up existing</div><div style="font-size:9.5px;color:#3B6D11;">Add up to GHS 2,000</div></div>
+</div>
+<div class="tile" data-go="loan-settle" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;margin-bottom:6px;">
+<div style="width:34px;height:34px;border-radius:9px;background:#007848;flex-shrink:0;"></div>
+<div style="flex:1;"><div style="font-size:12px;color:#173404;font-weight:500;">Early settlement</div><div style="font-size:9.5px;color:#3B6D11;">Saves GHS 614 in interest</div></div>
+</div>
+<div class="tile" data-go="loan-track" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;margin-bottom:6px;">
+<div style="width:34px;height:34px;border-radius:9px;background:#FAF5E8;flex-shrink:0;"></div>
+<div style="flex:1;"><div style="font-size:12px;color:#173404;font-weight:500;">Track progress & balance</div><div style="font-size:9.5px;color:#3B6D11;">Schedule, history, audit trail</div></div>
+</div>
+</div>
+</div>
+
+<div class="scr" id="loan-new">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">New loan</div></div>
+<div class="stp"><span>Step <b>1</b> of 3</span><span>90 sec decision</span></div>
+<div class="pbar"><i style="width:33%;"></i></div>
+<div style="margin-top:12px;text-align:center;"><div style="font-size:9.5px;color:#3B6D11;">Customer wants</div><div style="font-size:30px;font-weight:500;color:#173404;margin-top:4px;">GHS 6,000</div></div>
+<div style="margin-top:12px;padding:0 6px;"><input type="range" min="500" max="12000" value="6000" class="rng"/></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">Tenor</div>
+<div style="display:flex;gap:6px;margin-top:5px;"><span class="chip">3 mo</span><span class="chip on">6 mo</span><span class="chip">9 mo</span><span class="chip">12 mo</span></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">Purpose</div>
+<div class="gd3" style="margin-top:5px;"><div class="tile sel" style="padding:8px 4px;font-size:10px;">Restock shop</div><div class="tile" style="padding:8px 4px;font-size:10px;">School fees</div><div class="tile" style="padding:8px 4px;font-size:10px;">Medical</div></div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="loan-afford">Continue</button>
+</div>
+
+<div class="scr" id="loan-afford">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Affordability</div></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="fld"><div class="fld-lbl">Monthly income</div><input type="text" value="4,500"/></div>
+<div class="fld"><div class="fld-lbl">Other income</div><input type="text" value="800"/></div>
+<div class="fld"><div class="fld-lbl">Rent</div><input type="text" value="350"/></div>
+<div class="fld"><div class="fld-lbl">Food & utilities</div><input type="text" value="900"/></div>
+<div style="margin-top:12px;background:#137A3D;color:#fff;border-radius:12px;padding:12px;">
+<div class="summ-r" style="border:none;"><span style="color:#FAF5E8;">Disposable</span><span style="color:#FAF5E8;">GHS 3,600</span></div>
+<div class="summ-r" style="border:none;"><span style="color:#FAF5E8;">DSR</span><span style="color:#FAF5E8;">31% · healthy</span></div>
+</div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="loan-witness">Continue</button>
+</div>
+
+<div class="scr" id="loan-witness">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Sign & witness</div></div>
+<div class="scrl" style="margin-top:10px;">
+<div style="background:#137A3D;color:#fff;border-radius:12px;padding:13px;text-align:center;"><div style="font-size:9px;color:#FAF5E8;">APPLYING FOR</div><div style="font-size:24px;font-weight:500;margin-top:3px;">GHS 6,000</div><div style="font-size:10px;color:#FAF5E8;">6 mo · 18.5% · GHS 1,135/mo</div></div>
+<div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:14px;">Customer signature</div>
+<div style="height:70px;background:#fff;border:1.5px dashed #C8302C;border-radius:10px;"><svg width="100%" height="100%" viewBox="0 0 200 70" preserveAspectRatio="none"><path d="M10 50 Q 25 18, 45 45 T 80 40 Q 100 22, 120 50 T 165 35" stroke="#137A3D" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="loan-submitted">Submit</button>
+</div>
+
+<div class="scr" id="loan-submitted" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:20px;font-weight:500;">Loan submitted</div>
+<div style="font-size:11px;color:#FAF5E8;font-weight:500;">AWAITING DECISIONING</div>
+<div style="font-size:10px;color:#FAF5E8;">Reference · RM/2026/9412</div>
+</div>
+<button class="btn btn-l" data-go="loan-hub">Back</button>
+</div>
+
+<div class="scr" id="loan-topup">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Top‑up loan</div></div>
+<div class="fld" style="background:#FAF5E8;border:none;margin-top:10px;"><div class="fld-lbl">Top‑up · GHS</div><input type="text" value="1,500" style="font-size:18px;"/></div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Customer must approve on her phone</b> · OTP and sign‑off required.</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="loan-submitted">Submit</button>
+</div>
+
+<div class="scr" id="loan-settle">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Early settlement</div></div>
+<div style="background:#137A3D;color:#fff;border-radius:14px;padding:14px;margin-top:12px;text-align:center;"><div style="font-size:10px;color:#FAF5E8;">SETTLEMENT</div><div style="font-size:28px;font-weight:500;margin-top:3px;">GHS 7,952</div><div style="font-size:11px;color:#FAF5E8;">Customer saves GHS 614</div></div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="loan-submitted">Continue · count cash</button>
+</div>
+
+<div class="scr" id="loan-track">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Loan progress</div></div>
+<div style="background:#137A3D;color:#fff;border-radius:12px;padding:12px;margin-top:10px;"><div style="font-size:9px;color:#FAF5E8;">OUTSTANDING</div><div style="font-size:22px;font-weight:500;margin-top:2px;">GHS 7,800</div><div style="margin-top:8px;height:5px;background:#007848;border-radius:3px;"><div style="width:25%;height:5px;background:#C8302C;border-radius:3px;"></div></div></div>
+<div class="scrl" style="margin-top:12px;">
+<div class="row"><span style="font-size:10.5px;color:#3B6D11;">Feb 25 · 1st</span><span style="font-size:10.5px;color:#173404;font-weight:500;">GHS 763.50</span><span style="background:#137A3D;color:#FAF5E8;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:500;">PAID</span></div>
+<div class="row"><span style="font-size:10.5px;color:#3B6D11;">Mar 25 · 2nd</span><span style="font-size:10.5px;color:#173404;font-weight:500;">GHS 763.50</span><span style="background:#137A3D;color:#FAF5E8;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:500;">PAID</span></div>
+<div class="row"><span style="font-size:10.5px;color:#3B6D11;">May 25 · 4th</span><span style="font-size:10.5px;color:#173404;font-weight:500;">GHS 763.50</span><span style="background:#C8302C;color:#FAF5E8;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:500;">DUE</span></div>
+</div>
+</div>
+
+<div class="scr" id="outward-bank">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Outward · pick bank</div></div>
+<div style="background:#137A3D;color:#fff;border-radius:12px;padding:12px;margin-top:10px;"><div style="font-size:9px;color:#FAF5E8;">FLOAT</div><div style="font-size:24px;font-weight:500;margin-top:2px;">GHS 25,300</div></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="tile sel" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;margin-bottom:6px;"><div style="width:32px;height:32px;border-radius:8px;background:#137A3D;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">RM</div><div style="flex:1;"><div style="font-size:11px;color:#173404;font-weight:500;">RM Treasury · Head Office</div><div style="font-size:9px;color:#3B6D11;">9911 0000 4421 · primary</div></div><div class="chk on">✓</div></div>
+<div class="tile" style="display:flex;gap:11px;align-items:center;padding:11px;text-align:left;margin-bottom:6px;"><div style="width:32px;height:32px;border-radius:8px;background:#007848;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">GCB</div><div style="flex:1;"><div style="font-size:11px;color:#173404;font-weight:500;">GCB Bank · Madina</div></div></div>
+<div style="margin-top:8px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Locked list:</b> only Treasury‑approved banks appear here.</div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="outward-amount">Continue</button>
+</div>
+
+<div class="scr" id="outward-amount">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Lodge amount</div></div>
+<div style="background:#137A3D;color:#fff;border-radius:14px;padding:14px;margin-top:10px;text-align:center;"><div style="font-size:9px;color:#FAF5E8;">LODGEMENT</div><div style="font-size:30px;font-weight:500;margin-top:4px;">GHS 22,000</div></div>
+<div class="fld"><div class="fld-lbl">Bag seal</div><input type="text" value="SEAL‑0429‑4421"/></div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Supervisor co‑sign required</b> for lodgements over GHS 5,000.</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="outward-success">Submit</button>
+</div>
+
+<div class="scr" id="outward-success" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:18px;font-weight:500;">Lodgement queued</div>
+<div style="font-size:24px;font-weight:500;color:#FAF5E8;">GHS 22,000</div>
+<div style="font-size:11px;color:#FAF5E8;">Awaiting supervisor sign‑off</div>
+</div>
+<button class="btn btn-l" data-go="callover">Run call over</button>
+</div>
+
+<div class="scr" id="callover" style="padding:0;background:#FAF5E8;">
+<div style="background:#007848;color:#fff;padding:14px 16px;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" style="color:#FAF5E8;" data-back>‹</button><div class="ttl" style="color:#fff;">End‑of‑day call over</div></div>
+</div>
+<div class="scrl" style="padding:12px 16px 0;">
+<div style="font-size:10px;color:#3B6D11;font-weight:500;margin-bottom:6px;">RECONCILE</div>
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:10px;font-size:10.5px;">
+<div class="summ-r"><span>Opening float</span><span>GHS 5,000</span></div>
+<div class="summ-r"><span>+ Deposits collected</span><span style="color:#137A3D;">+ GHS 23,300</span></div>
+<div class="summ-r"><span>− Withdrawals</span><span style="color:#A32D2D;">− GHS 3,000</span></div>
+<div class="summ-r"><span>− Outward lodgement</span><span style="color:#A32D2D;">− GHS 22,000</span></div>
+<div class="summ-r" style="border:none;"><span style="font-weight:500;">System expects</span><span style="color:#137A3D;">GHS 3,300</span></div>
+</div>
+<div style="margin-top:10px;background:#137A3D;color:#fff;border-radius:12px;padding:12px;text-align:center;"><div style="font-size:9px;color:#FAF5E8;">VARIANCE</div><div style="font-size:24px;font-weight:500;margin-top:3px;">GHS 0.00</div><div style="font-size:10px;color:#FAF5E8;">✓ Cash balances</div></div>
+</div>
+<div style="padding:10px 16px;background:#fff;border-top:0.5px solid #FAF5E8;"><button class="btn btn-l" data-go="callover-success">Submit · supervisor sign‑off</button></div>
+</div>
+
+<div class="scr" id="callover-success" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:18px;font-weight:500;">Call over submitted</div>
+<div style="font-size:11px;color:#FAF5E8;">No variance · awaiting supervisor</div>
+</div>
+<button class="btn btn-l" data-go="tasks-queue">Tasks</button>
+</div>
+
+<div class="scr" id="tasks-queue" style="padding:0;background:#FAF5E8;">
+<div style="padding:18px 16px 0;"><div class="sb"><span>9:41</span><span>•••• 5G</span></div><div class="hd" style="justify-content:space-between;"><div style="display:flex;gap:10px;align-items:center;"><button class="bk" data-back>‹</button><div class="ttl">Verification queue</div></div><span class="staff-pill">3 PENDING</span></div></div>
+<div style="padding:10px 16px 0;display:flex;gap:6px;flex-wrap:wrap;"><span class="chip on">All</span><span class="chip">Loans</span><span class="chip">PEP review</span></div>
+<div class="scrl" style="padding:10px 16px 0;">
+<div class="case-card" data-go="case-detail" style="border-left:3px solid #E24B4A;margin-bottom:8px;">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;"><div style="display:flex;gap:9px;align-items:center;"><div style="width:32px;height:32px;border-radius:50%;background:#137A3D;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;">EB</div><div><div style="font-size:11px;color:#173404;font-weight:500;">Esi Bonney · field opening</div><div style="font-size:9px;color:#3B6D11;">FIELD‑0429‑0942 · 18 min ago</div></div></div><span class="case-pill" style="background:#FCEBEB;color:#A32D2D;">HIGH · KBA</span></div>
+<div style="display:flex;justify-content:space-between;font-size:9px;color:#3B6D11;margin-top:7px;"><span>Face match · 78% ⚠</span><span>Awaiting</span></div>
+</div>
+<div class="case-card" style="border-left:3px solid #FAC775;margin-bottom:8px;">
+<div style="display:flex;justify-content:space-between;"><div style="display:flex;gap:9px;align-items:center;"><div style="width:32px;height:32px;border-radius:50%;background:#007848;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;">YA</div><div><div style="font-size:11px;color:#173404;font-weight:500;">Yaa Asare · loan</div><div style="font-size:9px;color:#3B6D11;">RM/2026/9412</div></div></div><span class="case-pill" style="background:#FAEEDA;color:#854F0B;">STD · DSR</span></div>
+</div>
+</div>
+</div>
+
+<div class="scr" id="case-detail" style="padding:0;background:#FAF5E8;">
+<div style="background:#007848;color:#fff;padding:14px 16px;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" style="color:#FAF5E8;" data-back>‹</button><div><div style="font-size:13px;color:#fff;font-weight:500;">Esi Bonney · review</div><div style="font-size:9px;color:#FAF5E8;">FIELD‑0429‑0942 · escalated by 4421</div></div></div>
+</div>
+<div class="scrl" style="padding:12px 16px 0;">
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:11px;">
+<div style="font-size:10px;color:#3B6D11;font-weight:500;margin-bottom:5px;">VERIFICATION PATH</div>
+<div class="summ-r"><span>Face match</span><span style="color:#A32D2D;">78%</span></div>
+<div class="summ-r"><span>Liveness</span><span style="color:#137A3D;">Confirmed</span></div>
+<div class="summ-r"><span>KBA score</span><span style="color:#137A3D;">3 of 4</span></div>
+<div class="summ-r" style="border:none;"><span>Geolocation</span><span>Madina · matches officer</span></div>
+</div>
+<div style="margin-top:10px;background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:11px;">
+<div style="font-size:10px;color:#3B6D11;font-weight:500;margin-bottom:5px;">RECORDING · 4M 12S</div>
+<div style="background:#173404;border-radius:8px;padding:10px;color:#fff;"><div style="display:flex;align-items:center;gap:8px;"><button style="width:28px;height:28px;border-radius:50%;background:#C8302C;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="#173404"><polygon points="6 4 20 12 6 20"/></svg></button><span style="font-size:10px;color:#FAF5E8;">02:14 / 04:12</span></div><div style="margin-top:8px;height:4px;background:#007848;border-radius:2px;position:relative;"><div style="position:absolute;left:0;top:0;width:53%;height:4px;background:#C8302C;border-radius:2px;"></div></div></div>
+</div>
+</div>
+<div style="padding:10px 16px;display:flex;gap:6px;background:#fff;border-top:0.5px solid #FAF5E8;">
+<button class="btn btn-l" style="font-size:11px;flex:1;" data-go="case-decision">Approve</button>
+<button class="btn btn-o" style="font-size:11px;flex:1;">Refer</button>
+<button class="btn btn-w" style="font-size:11px;flex:1;">Reject</button>
+</div>
+</div>
+
+<div class="scr" id="case-decision">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Confirm decision</div></div>
+<div style="background:#137A3D;color:#fff;border-radius:12px;padding:13px;margin-top:10px;text-align:center;"><div style="font-size:9px;color:#FAF5E8;">APPROVING WITH OVERRIDE</div><div style="font-size:16px;font-weight:500;margin-top:3px;">Esi Bonney</div></div>
+<div class="fld"><div class="fld-lbl">Officer note</div><input type="text" value="KBA pass + voice match"/></div>
+<div style="margin-top:10px;background:#FAF5E8;border-radius:10px;padding:10px;font-size:10.5px;color:#173404;line-height:1.5;"><b style="font-weight:500;">Two‑officer rule:</b> a senior officer must co‑sign before account activation.</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="case-success">Confirm</button>
+</div>
+
+<div class="scr" id="case-success" style="background:#007848;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:18px;font-weight:500;">Decision recorded</div>
+<div style="font-size:11px;color:#FAF5E8;">Awaiting senior co‑sign</div>
+</div>
+<button class="btn btn-l" data-go="tasks-queue">Next case</button>
+</div>
+
+<div class="scr" id="agent-list">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd" style="justify-content:space-between;"><div style="display:flex;gap:10px;align-items:center;"><button class="bk" data-back>‹</button><div class="ttl">Smart Agents · Zone 4</div></div><span style="font-size:11px;color:#137A3D;font-weight:500;">+ Onboard</span></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="case-card" data-go="agent-detail" style="margin-bottom:6px;">
+<div style="display:flex;justify-content:space-between;"><div style="display:flex;gap:9px;align-items:center;"><div style="width:34px;height:34px;border-radius:50%;background:#C8302C;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;">JM</div><div><div style="font-size:11px;color:#173404;font-weight:500;">Joseph Mensah</div><div style="font-size:9px;color:#3B6D11;">SA‑MAD‑0042 · MTN vendor</div></div></div><span class="case-pill" style="background:#FAF5E8;color:#137A3D;">ACTIVE</span></div>
+<div style="font-size:9.5px;color:#3B6D11;margin-top:6px;">Float · GHS 4,200 / 8,000 · 14 txns today</div>
+</div>
+<div class="case-card" style="margin-bottom:6px;">
+<div style="display:flex;justify-content:space-between;"><div style="display:flex;gap:9px;align-items:center;"><div style="width:34px;height:34px;border-radius:50%;background:#137A3D;color:#FAF5E8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;">AB</div><div><div style="font-size:11px;color:#173404;font-weight:500;">Abena Boateng</div><div style="font-size:9px;color:#3B6D11;">SA‑MAD‑0067 · Telecel</div></div></div><span class="case-pill" style="background:#FAEEDA;color:#854F0B;">LOW FLOAT</span></div>
+</div>
+<div class="case-card" style="margin-bottom:6px;background:#FCEBEB;border-color:#E24B4A;">
+<div style="display:flex;justify-content:space-between;"><div style="display:flex;gap:9px;align-items:center;"><div style="width:34px;height:34px;border-radius:50%;background:#A32D2D;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;">DK</div><div><div style="font-size:11px;color:#173404;font-weight:500;">Daniel Kufuor</div><div style="font-size:9px;color:#3B6D11;">SA‑MAD‑0089 · MTN</div></div></div><span class="case-pill" style="background:#A32D2D;color:#fff;">SUSPENDED</span></div>
+</div>
+</div>
+</div>
+
+<div class="scr" id="agent-detail">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Joseph Mensah</div></div>
+<div style="margin-top:10px;background:#007848;color:#fff;border-radius:12px;padding:12px;"><div style="font-size:9px;color:#FAF5E8;">FLOAT</div><div style="font-size:20px;font-weight:500;">GHS 4,200</div><div style="height:4px;background:#173404;border-radius:2px;margin-top:6px;"><div style="width:52%;height:4px;background:#C8302C;border-radius:2px;"></div></div></div>
+<div class="gd2" style="margin-top:10px;"><button class="btn btn-l" style="font-size:11px;padding:10px;">Top up float</button><button class="btn btn-o" style="font-size:11px;padding:10px;">View ledger</button></div>
+<div style="margin-top:14px;font-size:10px;color:#3B6D11;font-weight:500;">RISK INDICATORS</div>
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:10px;margin-top:5px;font-size:10.5px;">
+<div class="summ-r"><span>Complaints (30d)</span><span style="color:#137A3D;">0</span></div>
+<div class="summ-r"><span>Variance incidents</span><span style="color:#137A3D;">0</span></div>
+<div class="summ-r" style="border:none;"><span>Velocity flag</span><span style="color:#137A3D;">Normal</span></div>
+</div>
+<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+<button style="background:#fff;border:0.5px solid #FAF5E8;color:#137A3D;font-size:10px;padding:7px 11px;border-radius:8px;cursor:pointer;font-weight:500;">Reset PIN</button>
+<button style="background:#FCEBEB;border:0.5px solid #E24B4A;color:#A32D2D;font-size:10px;padding:7px 11px;border-radius:8px;cursor:pointer;font-weight:500;">Suspend</button>
+</div>
+</div>
+
+<div class="scr" id="ag-splash" style="background:#FFC72C;color:#1A1A1A;justify-content:space-between;">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:60px;">
+<div style="width:78px;height:78px;background:#173404;display:flex;align-items:center;justify-content:center;border-radius:5px;box-shadow:0 8px 22px rgba(0,0,0,0.18);">
+<span style="font-family:'Times New Roman',Georgia,serif;color:#FAF5E8;font-size:24px;font-weight:600;letter-spacing:1.4px;">BAM</span>
+</div>
+<div style="text-align:center;">
+<div style="display:inline-flex;align-items:center;justify-content:center;font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:500;color:#173404;letter-spacing:0.3px;line-height:1;">
+<span>Bl</span>
+<span style="display:inline-block;width:18px;height:18px;border:2.8px solid #C8302C;border-radius:50%;margin:0 -2px 0 1px;"></span>
+<span style="display:inline-block;width:18px;height:18px;border:2.8px solid #C8302C;border-radius:50%;margin:0 1px 0 -6px;"></span>
+<span>m Mobile</span>
+</div>
+<div style="font-size:10px;color:#1A1A1A;margin-top:8px;letter-spacing:2.4px;font-weight:500;">SMART AGENT</div>
+</div>
+<div class="agent-pill" style="background:#173404;color:#FFC72C;">VENDOR APP · LOCKED‑DOWN</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;">
+<button class="btn" style="background:#173404;color:#FFC72C;" data-go="ag-login">Sign in</button>
+<div style="text-align:center;font-size:9px;color:#3B6D11;">Hardware‑bound · operates only at registered stand</div>
+</div>
+</div>
+
+<div class="scr" id="ag-login" style="background:#173404;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div style="text-align:center;margin-top:14px;"><div class="agent-pill" style="margin-top:10px;">SMART AGENT · MTN VENDOR</div></div>
+<div class="scrl" style="margin-top:14px;">
+<div class="fld-d"><div class="fld-lbl-d">Agent ID</div><div class="fld-val-d">SA‑MAD‑0042 · Joseph Mensah</div></div>
+<div class="fld-d"><div class="fld-lbl-d">6‑digit PIN</div><div style="display:flex;gap:6px;margin-top:6px;"><span style="width:8px;height:8px;background:#FFC72C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#FFC72C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#FFC72C;border-radius:50%;"></span><span style="width:8px;height:8px;background:#FFC72C;border-radius:50%;"></span><span style="width:8px;height:8px;border:1px solid #FAF5E8;border-radius:50%;"></span><span style="width:8px;height:8px;border:1px solid #FAF5E8;border-radius:50%;"></span></div></div>
+<div style="margin-top:12px;background:#007848;border-radius:10px;padding:10px;">
+<div style="font-size:9px;color:#FFC72C;font-weight:500;margin-bottom:6px;">DEVICE CHECKS</div>
+<div style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#fff;padding:3px 0;"><div class="chk on">✓</div><span>Device fingerprint matches</span></div>
+<div style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#fff;padding:3px 0;"><div class="chk on">✓</div><span>SIM matches registered MoMo</span></div>
+<div style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#fff;padding:3px 0;"><div class="chk on">✓</div><span>App not rooted</span></div>
+</div>
+</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="ag-geo">Continue · GPS check</button>
+</div>
+
+<div class="scr" id="ag-geo">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><div class="ttl">Confirm your stand</div></div>
+<div style="font-size:10px;color:#3B6D11;margin-top:6px;">50m geofence · Madina market entrance</div>
+<div style="margin-top:10px;height:160px;border-radius:14px;background:linear-gradient(135deg,#FAF5E8 0%,#FAF5E8 100%);position:relative;overflow:hidden;">
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border:1.5px dashed #137A3D;border-radius:50%;background:rgba(255,199,44,0.25);"></div>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-100%) rotate(-45deg);width:26px;height:26px;background:#FFC72C;border-radius:50% 50% 50% 0;border:3px solid #fff;animation:puls 1.6s ease-in-out infinite;"></div>
+<div style="position:absolute;top:8px;right:8px;background:#137A3D;color:#FFC72C;font-size:9px;padding:3px 8px;border-radius:5px;font-weight:500;">✓ AT YOUR STAND · 12m</div>
+</div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">If you move 50m,</b> the app locks and a supervisor is notified.</div>
+<button class="btn btn-l" style="margin-top:auto;" data-go="ag-home">Confirm · open shift</button>
+</div>
+
+<div class="scr" id="ag-home" style="padding:0;background:#FAF5E8;">
+<div style="background:#FFC72C;color:#1A1A1A;padding:14px 16px;">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+<div style="display:flex;gap:9px;align-items:center;"><div style="width:32px;height:32px;border-radius:50%;background:#173404;color:#FFC72C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;">JM</div><div><div style="font-size:13px;font-weight:500;">Joseph Mensah</div><div style="font-size:9px;color:#3B6D11;">SA‑MAD‑0042 · MTN</div></div></div>
+<div class="agent-pill" style="background:#173404;color:#FFC72C;">SHIFT · 02:14</div>
+</div>
+<div style="margin-top:12px;"><div style="font-size:9px;font-weight:500;">YOUR FLOAT</div><div style="font-size:24px;font-weight:500;margin-top:2px;">GHS 4,200.00</div></div>
+</div>
+<div style="padding:14px 16px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:14px;color:#173404;font-weight:500;">14</div><div style="font-size:8.5px;color:#3B6D11;">Today</div></div>
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:14px;color:#173404;font-weight:500;">GHS 35</div><div style="font-size:8.5px;color:#3B6D11;">Commission</div></div>
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:14px;color:#137A3D;font-weight:500;">0</div><div style="font-size:8.5px;color:#3B6D11;">Disputes</div></div>
+</div>
+<div style="padding:12px 16px 0;">
+<div class="tile" data-go="ag-deposit" style="display:flex;gap:11px;align-items:center;padding:13px;text-align:left;margin-bottom:8px;"><div style="width:42px;height:42px;border-radius:11px;background:#137A3D;flex-shrink:0;"></div><div style="flex:1;"><div style="font-size:13px;color:#173404;font-weight:500;">Customer deposit</div><div style="font-size:9.5px;color:#3B6D11;">Cash → wallet/bank</div></div></div>
+<div class="tile" data-go="ag-withdraw" style="display:flex;gap:11px;align-items:center;padding:13px;text-align:left;margin-bottom:8px;"><div style="width:42px;height:42px;border-radius:11px;background:#FFC72C;flex-shrink:0;"></div><div style="flex:1;"><div style="font-size:13px;color:#173404;font-weight:500;">Customer withdrawal</div><div style="font-size:9.5px;color:#3B6D11;">OTP from customer</div></div></div>
+</div>
+<div class="scrl" style="padding:6px 16px 0;">
+<div style="background:#fff;border:0.5px solid #FAF5E8;border-radius:10px;padding:10px;font-size:10.5px;">
+<div style="font-size:9px;color:#3B6D11;font-weight:500;margin-bottom:5px;">DAILY CAPS</div>
+<div class="summ-r"><span>Per‑customer deposit</span><span>GHS 1,000</span></div>
+<div class="summ-r"><span>Per‑customer withdrawal</span><span>GHS 500</span></div>
+<div class="summ-r" style="border:none;"><span>Velocity</span><span style="color:#137A3D;">Normal ✓</span></div>
+</div>
+</div>
+</div>
+
+<div class="scr" id="ag-deposit">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Customer deposit</div></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="gd3"><div class="tile sel" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;"><div class="lg lg-mtn">MTN</div><div style="font-size:10px;font-weight:500;">MTN</div></div><div class="tile" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;"><div class="lg lg-tel">telecel</div><div style="font-size:10px;font-weight:500;">Telecel</div></div><div class="tile" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;"><div class="lg lg-at">AT</div><div style="font-size:10px;font-weight:500;">AT</div></div></div>
+<div class="fld" style="display:flex;gap:8px;align-items:center;"><span style="font-size:12px;color:#173404;font-weight:500;">🇬🇭 +233</span><input type="tel" value="24 871 7218"/></div>
+<div class="fld" style="background:#FAF5E8;border:none;"><div class="fld-lbl">Cash received · GHS</div><input type="text" value="200.00" style="font-size:18px;"/></div>
+<div style="margin-top:10px;background:#FAEEDA;border:0.5px solid #FAC775;border-radius:10px;padding:10px;font-size:10px;color:#412402;line-height:1.5;"><b style="font-weight:500;">Anti‑fraud:</b> push to customer's phone · you never enter her PIN.</div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="ag-deposit-success">Send push</button>
+</div>
+
+<div class="scr" id="ag-deposit-success" style="background:#173404;color:#fff;">
+<div class="sb dk"><span>9:41</span><span>•••• 5G</span></div>
+<div class="suc-c">
+<div class="suc-tk"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+<div style="font-size:18px;font-weight:500;">Deposit posted</div>
+<div style="font-size:24px;font-weight:500;color:#FFC72C;">GHS 200.00</div>
+<div style="font-size:10px;color:#FAF5E8;">Your commission · GHS 2.00</div>
+</div>
+<button class="btn btn-l" data-go="ag-home">Done</button>
+</div>
+
+<div class="scr" id="ag-withdraw">
+<div class="sb"><span>9:41</span><span>•••• 5G</span></div>
+<div class="hd"><button class="bk" data-back>‹</button><div class="ttl">Customer withdrawal</div></div>
+<div class="scrl" style="margin-top:10px;">
+<div class="fld" style="display:flex;gap:8px;align-items:center;"><span style="font-size:12px;color:#173404;font-weight:500;">🇬🇭 +233</span><input type="tel" value="24 992 4218"/></div>
+<div class="fld" style="background:#FAF5E8;border:none;"><div class="fld-lbl">Amount · GHS</div><input type="text" value="500.00" style="font-size:18px;"/></div>
+</div>
+<button class="btn btn-l" style="margin-top:10px;" data-go="ag-deposit-success">Send OTP</button>
+</div>
+
+</div></div>
+
+<div class="cap">Bloom Mobile staff app · agency banking + Smart Agent · prototype only · all data is illustrative.</div>
+
+</div>
+
+<script>
+(function(){
+const screens={'splash':'Splash','login':'Officer login','mfa':'SMS MFA','geo':'Geo confirm','home':'Dashboard','cust-search':'Customers','field-open':'Field open','field-card':'Ghana Card','field-customer':'Customer details','field-address':'Address','field-purpose':'Purpose & kin','field-deposit':'Initial deposit','field-signature':'Sign & witness','field-submitted':'Submitted','ops-hub':'Operations','cd-find':'Cash deposit · find','cd-amount':'Note count','cd-success':'Deposit posted','cw-find':'Withdrawal · find','cw-amount':'Withdrawal amount','cw-otp':'Customer OTP','cw-success':'Authorised','md-collect':'MoMo deposit','md-pending':'Awaiting PIN','md-success':'MoMo posted','loan-hub':'Loan hub','loan-new':'New loan','loan-afford':'Affordability','loan-witness':'Witness','loan-submitted':'Loan submitted','loan-topup':'Top‑up','loan-settle':'Early settle','loan-track':'Progress','outward-bank':'Outward · bank','outward-amount':'Lodge amount','outward-success':'Lodgement queued','callover':'Call over','callover-success':'Call over submitted','tasks-queue':'Verification queue','case-detail':'Case · Esi B.','case-decision':'Confirm decision','case-success':'Decision recorded','agent-list':'Smart Agents','agent-detail':'Agent · Joseph M.','ag-splash':'Smart Agent splash','ag-login':'Agent sign in','ag-geo':'Agent stand','ag-home':'Agent dashboard','ag-deposit':'Agent · deposit','ag-deposit-success':'Posted','ag-withdraw':'Agent · withdrawal'};
+const hist=['splash'];
+const cur=document.getElementById('rm-cur');
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('act'));const el=document.getElementById(id);if(!el)return;el.classList.add('act');cur.textContent=screens[id]||id;el.scrollTop=0;const sc=el.querySelector('.scrl');if(sc)sc.scrollTop=0;}
+function go(id){hist.push(id);show(id);}
+function back(){if(hist.length>1){hist.pop();show(hist[hist.length-1]);}}
+document.body.addEventListener('click',e=>{
+const goEl=e.target.closest('[data-go]');if(goEl){e.preventDefault();go(goEl.dataset.go);return;}
+const bk=e.target.closest('[data-back]');if(bk){e.preventDefault();back();return;}
+const jp=e.target.closest('[data-jump]');if(jp){e.preventDefault();hist.push(jp.dataset.jump);show(jp.dataset.jump);return;}
+});
+document.getElementById('rm-reset').addEventListener('click',()=>{hist.length=0;hist.push('splash');show('splash');});
+})();
+</script>
+</body>
+</html>
